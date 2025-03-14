@@ -1,0 +1,247 @@
+<!-- Status Overview Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <!-- Meta Descriptions -->
+    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Meta Descriptions</h3>
+            <i class="fas fa-file-alt text-yellow-300 text-xl"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold">{{ audit_results.missing_meta|length }}</div>
+            <div class="text-red-100 mt-1">Pages Need Attention</div>
+        </div>
+    </div>
+
+    <!-- Titles -->
+    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Titles</h3>
+            <i class="fas fa-heading text-yellow-300 text-xl"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold">{{ audit_results.missing_titles|length }}</div>
+            <div class="text-orange-100 mt-1">Pages Without Titles</div>
+        </div>
+    </div>
+
+    <!-- Broken Links -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between text-slate-800">
+            <h3 class="text-lg font-semibold">Broken Links</h3>
+            <i class="fas fa-unlink text-red-500"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold text-slate-800">{{ audit_results.broken_links|length }}</div>
+            <div class="text-slate-500 mt-1">Links Not Working</div>
+        </div>
+    </div>
+
+    <!-- Uncompressed Pages -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between text-slate-800">
+            <h3 class="text-lg font-semibold">Uncompressed Pages</h3>
+            <i class="fas fa-compress text-orange-500"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold text-slate-800">{{ audit_results.uncompressed_pages|length }}</div>
+            <div class="text-slate-500 mt-1">Need Optimization</div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Analysis Sections -->
+<div class="space-y-6">
+    <!-- Elements Section -->
+    <!-- Elements Section -->
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>
+                Elements
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- H1 Tags -->
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-heading text-orange-500 mr-2"></i>
+                        <h4 class="text-lg font-semibold text-slate-800">H1 Tags</h4>
+                    </div>
+                    <div class="space-y-2">
+                        {% for url in audit_results.missing_h1 %}
+                        <div class="text-sm text-slate-600 bg-white p-2 rounded border border-slate-200">
+                            {{ url }}
+                        </div>
+                        {% empty %}
+                        <div class="text-sm text-green-600">All pages have H1 tags!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- H2 Tags -->
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-heading text-blue-500 mr-2"></i>
+                        <h4 class="text-lg font-semibold text-slate-800">H2 Tags</h4>
+                    </div>
+                    <div class="space-y-2">
+                        {% for url in audit_results.missing_h2 %}
+                        <div class="text-sm text-slate-600 bg-white p-2 rounded border border-slate-200">
+                            {{ url }}
+                        </div>
+                        {% empty %}
+                        <div class="text-sm text-green-600">All pages have H2 tags!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- H3 Tags -->
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-heading text-green-500 mr-2"></i>
+                        <h4 class="text-lg font-semibold text-slate-800">H3 Tags</h4>
+                    </div>
+                    <div class="space-y-2">
+                        {% for url in audit_results.missing_h3 %}
+                        <div class="text-sm text-slate-600 bg-white p-2 rounded border border-slate-200">
+                            {{ url }}
+                        </div>
+                        {% empty %}
+                        <div class="text-sm text-green-600">All pages have H3 tags!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Title Tags -->
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-heading text-yellow-500 mr-2"></i>
+                        <h4 class="text-lg font-semibold text-slate-800">Title Tags</h4>
+                    </div>
+                    <div class="space-y-2">
+                        {% for url in audit_results.missing_titles %}
+                        <div class="text-sm text-slate-600 bg-white p-2 rounded border border-slate-200">
+                            {{ url }}
+                        </div>
+                        {% empty %}
+                        <div class="text-sm text-green-600">All pages have Title tags!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Meta Descriptions -->
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-file-alt text-purple-500 mr-2"></i>
+                        <h4 class="text-lg font-semibold text-slate-800">Meta Descriptions</h4>
+                    </div>
+                    <div class="space-y-2">
+                        {% for url in audit_results.missing_meta %}
+                        <div class="text-sm text-slate-600 bg-white p-2 rounded border border-slate-200">
+                            {{ url }}
+                        </div>
+                        {% empty %}
+                        <div class="text-sm text-green-600">All pages have Meta Descriptions!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Meta Keywords -->
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-tags text-gray-500 mr-2"></i>
+                        <h4 class="text-lg font-semibold text-slate-800">Meta Keywords</h4>
+                    </div>
+                    <div class="space-y-2">
+                        {% for url in audit_results.meta_keywords %}
+                        <div class="text-sm text-slate-600 bg-white p-2 rounded border border-slate-200">
+                            {{ url }}
+                        </div>
+                        {% empty %}
+                        <div class="text-sm text-green-600">All pages have Meta Keywords!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Duplicate Content Section -->
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-copy text-blue-500 mr-2"></i>
+                Duplicate Content
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="space-y-6">
+                {% for title, urls in audit_results.duplicate_titles.items %}
+                {% if urls|length > 1 %}
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="font-medium text-slate-800 mb-2">Duplicate Title: {{ title }}</div>
+                    <div class="space-y-2">
+                        {% for url in urls %}
+                        <div class="text-sm text-slate-600 bg-white p-2 rounded border border-slate-200">
+                            {{ url }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Broken Links Section -->
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-unlink text-red-500 mr-2"></i>
+                Broken Links
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4">
+                {% for link, error in audit_results.broken_links %}
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="text-sm text-slate-600">{{ link }}</div>
+                        <div class="text-sm text-red-500">Error: {{ error }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-green-600 text-center py-4">No broken links found!</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Keyword Analysis Section -->
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-tags text-green-500 mr-2"></i>
+                Keyword Analysis
+            </h3>
+        </div>
+        <div class="p-6">
+            {% for url, keywords in audit_results.keyword_scan.items %}
+            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 mb-4">
+                <div class="font-medium text-slate-800 mb-2">{{ url }}</div>
+                <div class="flex flex-wrap gap-2">
+                    {% for keyword in keywords %}
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                        {{ keyword }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-slate-500">No keywords found in images.</div>
+            {% endfor %}
+        </div>
+    </section>
+</div>

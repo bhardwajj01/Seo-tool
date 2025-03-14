@@ -1,0 +1,48 @@
+# Byte-compiled / cached files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+
+# Django-specific files
+*.sqlite3
+db.sqlite3
+*.log
+
+# Local settings
+.env
+*.env
+settings_local.py
+
+# Migrations (optional, if you regenerate them)
+**/migrations/*.py
+!**/migrations/__init__.py
+
+
+
+# VS Code settings (if using VS Code)
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# macOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# Python virtual environment & dependency management
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# Compiled files
+*.so
+*.egg
+*.egg-info/
+dist/
+build/

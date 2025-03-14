@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ url }} Analysis Report</title>
+    <style>
+        @page {
+            size: letter portrait;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #22c55e;
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            color: #22c55e;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .report-section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            color: #22c55e;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .subsection-title {
+            color: #15803d;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .metric-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .metric-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #22c55e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th {
+            background-color: #f0fdf4;
+            color: #333;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+            font-size: 12px;
+        }
+
+        table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            font-size: 12px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .status-good {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-warning {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        .status-error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .ai-section {
+            background-color: #f0fdf4;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ai-section h3 {
+            color: #15803d;
+            border-bottom: 1px solid #a7f3d0;
+            font-size: 16px;
+            margin-top: 0;
+            padding-bottom: 5px;
+        }
+
+        .two-columns {
+            column-count: 2;
+            column-gap: 20px;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        .clearfix {
+            clear: both;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-success {
+            color: #15803d;
+        }
+
+        .text-warning {
+            color: #854d0e;
+        }
+
+        .text-danger {
+            color: #b91c1c;
+        }
+
+        .text-primary {
+            color: #1d4ed8;
+        }
+
+        .mb-5 {
+            margin-bottom: 5px;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+
+        .mb-15 {
+            margin-bottom: 15px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        .url-text {
+            word-break: break-all;
+            font-size: 11px;
+            color: #444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Website Analysis Report</h1>
+        <p>Domain: {{ url }}</p>
+        <p>Generated on: {{ timestamp }}</p>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="report-section">
+        <div class="section-title">Table of Contents</div>
+        <ol>
+            <li>Performance Metrics</li>
+            <li>Security & SSL</li>
+            <li>Indexing & Crawlability</li>
+            <li>Meta Data & Structure</li>
+            <li>Schema Markup</li>
+            <li>Backlink Profile</li>
+            <li>Traffic Analysis</li>
+            <li>AI Analysis</li>
+        </ol>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 1. Performance Metrics -->
+    <div class="report-section">
+        <div class="section-title">1. Performance Metrics</div>
+
+        <!-- Performance Overview -->
+        <div class="subsection-title">Performance Overview</div>
+        <div class="metric-grid">
+            {% for country, data in adjusted_scores.items %}
+            {% if country == "USA" %}
+            <div class="metric-card">
+                <h3>Performance Score</h3>
+                <div class="metric-value">{{ data.Score|floatformat:2 }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Performance Grade</h3>
+                <div class="metric-value">{{ data.Grade }}</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            {% for key, value in pagespeed_metrics.items %}
+            {% if key == "TTI (Time to Interactive)" %}
+            <div class="metric-card">
+                <h3>Time to Interactive</h3>
+                <div class="metric-value">{{ value|floatformat:2 }} ms</div>
+            </div>
+            {% endif %}
+            {% if key == "SI (Speed Index)" %}
+            <div class="metric-card">
+                <h3>Speed Index</h3>
+                <div class="metric-value">{{ value|floatformat:2 }} sec</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Core Web Vitals -->
+        <div class="subsection-title">Core Web Vitals</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in core_metrics.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value|floatformat:2 }}{% if "Time" in key or "Paint" in key %} ms{% endif %}</td>
+                    <td>
+                        {% if key in 'First Contentful Paint,Largest Contentful Paint' %}
+                        {% if value < 1000 %} <span class="status status-good">Good</span>
+                            {% elif value < 2500 %} <span class="status status-warning">Needs Improvement</span>
+                                {% else %}
+                                <span class="status status-error">Poor</span>
+                                {% endif %}
+                                {% elif key == 'Cumulative Layout Shift' %}
+                                {% if value < 0.1 %} <span class="status status-good">Good</span>
+                                    {% elif value < 0.25 %} <span class="status status-warning">Needs Improvement</span>
+                                        {% else %}
+                                        <span class="status status-error">Poor</span>
+                                        {% endif %}
+                                        {% else %}
+                                        {% if value < 1000 %} <span class="status status-good">Good</span>
+                                            {% elif value < 2500 %} <span class="status status-warning">Moderate</span>
+                                                {% else %}
+                                                <span class="status status-error">Slow</span>
+                                                {% endif %}
+                                                {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- PageSpeed Metrics -->
+        <div class="subsection-title">PageSpeed Metrics</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in pagespeed_metrics.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value|floatformat:2 }} ms</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Regional Performance -->
+        <div class="subsection-title">Regional Performance</div>
+        <div class="metric-grid">
+            {% for country, data in adjusted_scores.items %}
+            <div class="metric-card">
+                <h3>{{ country }}</h3>
+                <div class="metric-value">{{ data.Score|floatformat:2 }} (Grade: {{ data.Grade }})</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 2. Security & SSL -->
+    <div class="report-section">
+        <div class="section-title">2. Security & SSL</div>
+
+        <!-- SSL Certificate -->
+        <div class="subsection-title">SSL Certificate</div>
+        <table>
+            <tr>
+                <td>Status</td>
+                <td>
+                    {% if ssl_status == "valid" %}
+                    <span class="status status-good">Valid</span>
+                    {% else %}
+                    <span class="status status-error">Invalid</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% if ssl_info %}
+            {% if ssl_info.issuer %}
+            <tr>
+                <td>Issuer</td>
+                <td>
+                    {% for key, value in ssl_info.issuer.items %}
+                    {% if key == "organizationName" %}{{ value }}{% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td>Valid From</td>
+                <td>{{ ssl_info.valid_from|default:"Unknown" }}</td>
+            </tr>
+            <tr>
+                <td>Valid Until</td>
+                <td>{{ ssl_info.valid_until|default:"Unknown" }}</td>
+            </tr>
+            <tr>
+                <td>Days Remaining</td>
+                <td>{{ ssl_info.days_left|default:"Unknown" }} days</td>
+            </tr>
+            {% endif %}
+        </table>
+
+        <!-- Security Status -->
+        <div class="subsection-title">Security Status</div>
+        <table>
+            <tr>
+                <td>Malware Detection</td>
+                <td>
+                    {% if malware_info.status == "safe" %}
+                    <span class="status status-good">Safe</span>
+                    {% elif malware_info.status == "malicious" %}
+                    <span class="status status-error">Malicious</span>
+                    {% else %}
+                    <span class="status status-warning">Unknown</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Check Time</td>
+                <td>{{ malware_info.check_time|default:"Unknown" }}</td>
+            </tr>
+        </table>
+
+        {% if malware_info.threat_details %}
+        <div class="subsection-title">Threat Details</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Platform</th>
+                    <th>Threat Entry</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for threat in malware_info.threat_details %}
+                <tr>
+                    <td>{{ threat.type }}</td>
+                    <td>{{ threat.platform }}</td>
+                    <td class="url-text">{{ threat.threat_entry }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <!-- Indexing Information -->
+        <div class="subsection-title">Indexing Information</div>
+        <table>
+            <tr>
+                <td>Robots.txt Present</td>
+                <td>
+                    {% if indexing_info.robots_txt_status %}
+                    <span class="status status-good">Yes</span>
+                    {% else %}
+                    <span class="status status-warning">No</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>No-Index Meta Tag</td>
+                <td>
+                    {% if indexing_info.noindex_meta %}
+                    <span class="status status-warning">Yes</span>
+                    {% else %}
+                    <span class="status status-good">No</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 3. Indexing & Crawlability -->
+    <div class="report-section">
+        <div class="section-title">3. Indexing & Crawlability</div>
+
+        <!-- Indexing Overview -->
+        <div class="subsection-title">Indexing Overview</div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <h3>Indexed Pages</h3>
+                <div class="metric-value">{{ serp_analysis.indexed_pages|length }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Pages Crawled</h3>
+                <div class="metric-value">{{ domain_metrics.pages_crawled|default:"N/A" }}</div>
+            </div>
+        </div>
+
+        <!-- Search Rankings -->
+        <div class="subsection-title">Search Rankings</div>
+        {% if serp_analysis.rankings %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Position</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ranking in serp_analysis.rankings %}
+                <tr>
+                    <td>{{ ranking.title }}</td>
+                    <td>{{ ranking.position }}</td>
+                    <td class="url-text">{{ ranking.link }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-center">No ranking data available</p>
+        {% endif %}
+
+        <!-- Competitors -->
+        <div class="subsection-title">Competitors</div>
+        {% if serp_analysis.competitors %}
+        <table>
+            <tbody>
+                {% for competitor in serp_analysis.competitors %}
+                <tr>
+                    <td>{{ competitor }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-center">No competitor data available</p>
+        {% endif %}
+
+        <!-- Sitemap Analysis -->
+        <div class="subsection-title">Sitemap Analysis</div>
+        {% if sitemap_analysis %}
+        {% if sitemap_analysis.status == "error" %}
+        <p class="text-danger">{{ sitemap_analysis.error_message }}</p>
+        {% else %}
+        <table>
+            <tr>
+                <td>Total URLs</td>
+                <td>{{ sitemap_analysis.total|default:"0" }}</td>
+            </tr>
+            <tr>
+                <td>Working URLs</td>
+                <td>{{ sitemap_analysis.working|default:"0" }}</td>
+            </tr>
+            <tr>
+                <td>Broken URLs</td>
+                <td>{{ sitemap_analysis.broken|default:"0" }}</td>
+            </tr>
+            <tr>
+                <td>Server Errors</td>
+                <td>{{ sitemap_analysis.errors|default:"0" }}</td>
+            </tr>
+        </table>
+        {% endif %}
+        {% else %}
+        <p class="text-center">No sitemap data available</p>
+        {% endif %}
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 4. Meta Data & Structure -->
+    <div class="report-section">
+        <div class="section-title">4. Meta Data & Structure</div>
+
+        <!-- Status Overview -->
+        <div class="subsection-title">Overview</div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <h3>Missing Meta Descriptions</h3>
+                <div class="metric-value">{{ audit_results.missing_meta|length }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Missing Titles</h3>
+                <div class="metric-value">{{ audit_results.missing_titles|length }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Missing H1 Tags</h3>
+                <div class="metric-value">{{ audit_results.missing_h1|length }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Broken Links</h3>
+                <div class="metric-value">{{ audit_results.broken_links|length }}</div>
+            </div>
+        </div>
+
+        <!-- Missing Elements -->
+        {% if audit_results.missing_h1 or audit_results.missing_meta %}
+        <div class="subsection-title">Missing Elements</div>
+        <div class="two-columns mb-15">
+            {% if audit_results.missing_h1 %}
+            <div>
+                <p class="font-bold mb-5">Missing H1 Tags:</p>
+                <ul>
+                    {% for url in audit_results.missing_h1|slice:":5" %}
+                    <li class="url-text">{{ url }}</li>
+                    {% endfor %}
+                    {% if audit_results.missing_h1|length > 5 %}
+                    <li class="url-text">... {{ audit_results.missing_h1|length|add:"-5" }} more</li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if audit_results.missing_meta %}
+            <div>
+                <p class="font-bold mb-5">Missing Meta Descriptions:</p>
+                <ul>
+                    {% for url in audit_results.missing_meta|slice:":5" %}
+                    <li class="url-text">{{ url }}</li>
+                    {% endfor %}
+                    {% if audit_results.missing_meta|length > 5 %}
+                    <li class="url-text">... {{ audit_results.missing_meta|length|add:"-5" }} more</li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Duplicate Content -->
+        {% for title, urls in audit_results.duplicate_titles.items %}
+        {% if forloop.first %}
+        <div class="subsection-title">Duplicate Content</div>
+        {% endif %}
+        {% if urls|length > 1 %}
+        <div class="mb-15">
+            <p class="font-bold mb-5">Duplicate Title: {{ title }}</p>
+            <ul>
+                {% for url in urls|slice:":3" %}
+                <li class="url-text">{{ url }}</li>
+                {% endfor %}
+                {% if urls|length > 3 %}
+                <li class="url-text">... {{ urls|length|add:"-3" }} more</li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        <!-- Broken Links -->
+        {% if audit_results.broken_links %}
+        <div class="subsection-title">Broken Links</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Link</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for link, error in audit_results.broken_links|slice:":5" %}
+                <tr>
+                    <td class="url-text">{{ link }}</td>
+                    <td>{{ error }}</td>
+                </tr>
+                {% endfor %}
+                {% if audit_results.broken_links|length > 5 %}
+                <tr>
+                    <td colspan="2" class="text-center">... {{ audit_results.broken_links|length|add:"-5" }} more broken
+                        links</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 5. Schema Markup -->
+    <div class="report-section">
+        <div class="section-title">5. Schema Markup</div>
+
+        <!-- Schema Overview -->
+        <div class="subsection-title">Schema Overview</div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <h3>Total Schemas</h3>
+                <div class="metric-value">{{ schema_analysis.total_schemas }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>JSON-LD Schemas</h3>
+                <div class="metric-value">{{ schema_analysis.jsonld_count }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Microdata/RDFa Schemas</h3>
+                <div class="metric-value">{{ schema_analysis.microdata_count }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Schema Errors</h3>
+                <div class="metric-value">{{ schema_analysis.errors|length }}</div>
+            </div>
+        </div>
+
+        <!-- Schema Errors -->
+        {% if schema_analysis.errors %}
+        <div class="subsection-title">Schema Validation Errors</div>
+        <ul>
+            {% for error in schema_analysis.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <!-- JSON-LD Schema Types -->
+        {% if schema_analysis.jsonld_details %}
+        <div class="subsection-title">JSON-LD Schema Types</div>
+        <ul>
+            {% for schema in schema_analysis.jsonld_details %}
+            <li>{{ schema.Type }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 6. Backlink Profile -->
+    <div class="report-section">
+        <div class="section-title">6. Backlink Profile</div>
+
+        <!-- Domain Metrics -->
+        <div class="subsection-title">Domain Metrics</div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <h3>Domain Authority</h3>
+                <div class="metric-value">{{ domain_metrics.domain_authority|default:"N/A" }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Page Authority</h3>
+                <div class="metric-value">{{ domain_metrics.page_authority|default:"N/A" }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Total Backlinks</h3>
+                <div class="metric-value">{{ domain_metrics.total_backlinks|default:"N/A" }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Spam Score</h3>
+                <div class="metric-value">{{ domain_metrics.spam_score|default:"N/A" }}</div>
+            </div>
+        </div>
+
+        <!-- Backlink Profile -->
+        <div class="subsection-title">Backlink Profile</div>
+        <table>
+            <tr>
+                <td>External Backlinks</td>
+                <td>{{ domain_metrics.external_backlinks|default:"N/A" }}</td>
+            </tr>
+            <tr>
+                <td>Root Domains Linking</td>
+                <td>{{ domain_metrics.root_domains_linking|default:"N/A" }}</td>
+            </tr>
+            <tr>
+                <td>Deleted Backlinks</td>
+                <td>{{ domain_metrics.deleted_backlinks|default:"N/A" }}</td>
+            </tr>
+            <tr>
+                <td>Nofollow Backlinks</td>
+                <td>{{ domain_metrics.nofollow_backlinks|default:"N/A" }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 7. Traffic Analysis -->
+    <div class="report-section">
+        <div class="section-title">7. Traffic Analysis</div>
+
+        {% if traffic_metrics.status == "success" %}
+        <!-- Traffic Overview -->
+        <div class="subsection-title">Traffic Overview</div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <h3>Total Visits</h3>
+                <div class="metric-value">{{ traffic_metrics.data.visits }}</div>
+                <div
+                    class="{% if '-' in traffic_metrics.data.visits_change %}text-danger{% else %}text-success{% endif %}">
+                    {{ traffic_metrics.data.visits_change }}
+                </div>
+            </div>
+            <div class="metric-card">
+                <h3>Unique Visitors</h3>
+                <div class="metric-value">{{ traffic_metrics.data.unique_visitors }}</div>
+                <div
+                    class="{% if '-' in traffic_metrics.data.unique_visitors_change %}text-danger{% else %}text-success{% endif %}">
+                    {{ traffic_metrics.data.unique_visitors_change }}
+                </div>
+            </div>
+            <div class="metric-card">
+                <h3>Bounce Rate</h3>
+                <div class="metric-value">{{ traffic_metrics.data.bounce_rate }}</div>
+                <div
+                    class="{% if '-' in traffic_metrics.data.bounce_rate_change %}text-success{% else %}text-danger{% endif %}">
+                    {{ traffic_metrics.data.bounce_rate_change }}
+                </div>
+            </div>
+            <div class="metric-card">
+                <h3>Avg. Visit Duration</h3>
+                <div class="metric-value">{{ traffic_metrics.data.avg_visit_duration }}</div>
+                <div
+                    class="{% if '-' in traffic_metrics.data.avg_visit_duration_change %}text-danger{% else %}text-success{% endif %}">
+                    {{ traffic_metrics.data.avg_visit_duration_change }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Engagement & Device -->
+        <div class="subsection-title">Engagement & Device Breakdown</div>
+        <table>
+            <tr>
+                <td>Pages Per Visit</td>
+                <td>{{ traffic_metrics.data.pages_per_visit }}</td>
+                <td
+                    class="{% if '-' in traffic_metrics.data.pages_per_visit_change %}text-danger{% else %}text-success{% endif %}">
+                    {{ traffic_metrics.data.pages_per_visit_change }}
+                </td>
+            </tr>
+            <tr>
+                <td>Mobile Share</td>
+                <td colspan="2">{{ traffic_metrics.data.mobile_share }}</td>
+            </tr>
+            <tr>
+                <td>Desktop Share</td>
+                <td colspan="2">{{ traffic_metrics.data.desktop_share }}</td>
+            </tr>
+        </table>
+
+        <!-- Market Analysis -->
+        <div class="subsection-title">Market Analysis</div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <h3>Market Share</h3>
+                <div class="metric-value">{{ traffic_metrics.data.market_share }}</div>
+            </div>
+            <div class="metric-card">
+                <h3>Market Traffic</h3>
+                <div class="metric-value">{{ traffic_metrics.data.market_traffic }}</div>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-center text-danger">Traffic data not available</p>
+        {% endif %}
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- 8. AI Analysis -->
+    <div class="report-section">
+        <div class="section-title">8. AI Analysis</div>
+
+        {% if ai_analysis %}
+        <!-- Overview -->
+        <div class="ai-section">
+            <h3>Overview</h3>
+            <p>{{ ai_analysis.Overview }}</p>
+        </div>
+
+        <!-- Strengths -->
+        <div class="ai-section">
+            <h3>Strengths</h3>
+            <p>{{ ai_analysis.Strengths }}</p>
+        </div>
+
+        <!-- Weaknesses -->
+        <div class="ai-section">
+            <h3>Weaknesses</h3>
+            <p>{{ ai_analysis.Weaknesses }}</p>
+        </div>
+
+        <!-- Advice -->
+        <div class="ai-section">
+            <h3>Advice</h3>
+            <p>{{ ai_analysis.Advice }}</p>
+        </div>
+        {% else %}
+        <p class="text-center text-danger">AI analysis not available</p>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p>This report was generated using SEO Analysis Tool. All data is based on analysis performed on {{ timestamp
+            }}.</p>
+    </div>
+</body>
+
+</html>

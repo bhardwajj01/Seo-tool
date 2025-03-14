@@ -1,0 +1,23 @@
+<h2>Domain Information</h2>
+<p><strong>IP Addresses:</strong> {{ domain_info.ip_addresses|default:"N/A" }}</p>
+
+<h3>WHOIS Data</h3>
+<ul>
+    <li><strong>Domain Name:</strong> {{ domain_info.whois_info.Domain_Name|default:"N/A" }}</li>
+    <li><strong>Registrar:</strong> {{ domain_info.whois_info.Registrar|default:"N/A" }}</li>
+    <li><strong>Creation Date:</strong> {{ domain_info.whois_info.Creation_Date|default:"N/A" }}</li>
+    <li><strong>Expiration Date:</strong> {{ domain_info.whois_info.Expiration_Date|default:"N/A" }}</li>
+    <li><strong>Status:</strong> {{ domain_info.whois_info.Status|default:"N/A" }}</li>
+</ul>
+
+<h3>DNS Records</h3>
+{% if domain_info.dns_records %}
+    {% for record, values in domain_info.dns_records.items %}
+        <p><strong>{{ record }}:</strong> {{ values }}</p>
+    {% endfor %}
+{% else %}
+    <p>No DNS records found.</p>
+{% endif %}
+
+<h3>Blacklist Status</h3>
+<p>{{ domain_info.blacklist_status|default:"Not Available" }}</p>

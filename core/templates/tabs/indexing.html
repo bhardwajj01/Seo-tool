@@ -1,0 +1,143 @@
+{% load static %}
+<!-- Status Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <!-- Indexed Pages -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between text-slate-800">
+            <h3 class="text-lg font-semibold">Indexed Pages</h3>
+            <i class="fas fa-search text-blue-500"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold text-slate-800">{{ serp_analysis.indexed_pages|length }}</div>
+            <div class="text-slate-500 mt-1">Found in Google</div>
+        </div>
+    </div>
+    <!-- Crawled Pages -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between text-slate-800">
+            <h3 class="text-lg font-semibold">Pages Crawled</h3>
+            <i class="fas fa-spider text-blue-500"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold text-slate-800">{{ domain_metrics.pages_crawled }}</div>
+            <div class="text-slate-500 mt-1">Total Pages</div>
+        </div>
+    </div>
+</div>
+
+<!-- SERP Rankings -->
+<section class="bg-white rounded-xl shadow-lg mt-6">
+    <div class="p-6 border-b border-slate-100">
+        <h3 class="text-xl font-bold text-slate-800">
+            <i class="fas fa-search text-blue-500 mr-2"></i>
+            Search Rankings
+        </h3>
+    </div>
+    <div class="p-6">
+        <div class="space-y-4">
+            {% if serp_analysis.rankings %}
+            {% for ranking in serp_analysis.rankings %}
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-slate-800">
+                        {{ ranking.title }}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Rank #{{ ranking.position }}
+                    </span>
+                </div>
+                {% if ranking.snippet %}
+                <div class="mt-2 text-sm text-slate-600">
+                    {{ ranking.snippet }}
+                </div>
+                {% endif %}
+                {% if ranking.displayed_link %}
+                <div class="mt-1 text-xs text-slate-500">
+                    {{ ranking.displayed_link }}
+                </div>
+                {% endif %}
+                <div class="mt-2 text-xs text-blue-600">{{ ranking.link }}</div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 text-center">
+                <span class="text-sm text-slate-500">No ranking data available</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Competitor Analysis -->
+<section class="bg-white rounded-xl shadow-lg mt-6">
+    <div class="p-6 border-b border-slate-100">
+        <h3 class="text-xl font-bold text-slate-800">
+            <i class="fas fa-users text-blue-500 mr-2"></i>
+            Competitor Analysis
+        </h3>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if serp_analysis.competitors %}
+            {% for competitor in serp_analysis.competitors %}
+            <div
+                class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:border-blue-300 transition-colors duration-300">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-globe text-blue-500"></i>
+                    </div>
+                    <span class="text-sm font-medium text-slate-800">{{ competitor }}</span>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-span-2 bg-slate-50 rounded-xl p-4 border border-slate-200 text-center">
+                <span class="text-sm text-slate-500">No competitor data available</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Sitemap Analysis -->
+{% if sitemap_analysis %}
+<section class="bg-white rounded-xl shadow-lg mt-6">
+    <div class="p-6 border-b border-slate-100">
+        <h3 class="text-xl font-bold text-slate-800">
+            <i class="fas fa-sitemap text-blue-500 mr-2"></i>
+            Sitemap Analysis
+        </h3>
+    </div>
+    <div class="p-6">
+        {% if sitemap_analysis.status == "error" %}
+        <div class="bg-red-50 rounded-xl p-4 border border-red-200">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <span class="text-sm font-medium text-red-800">{{ sitemap_analysis.error_message }}</span>
+            </div>
+        </div>
+        {% else %}
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                <div class="text-sm font-medium text-slate-500">Total URLs</div>
+                <div class="text-2xl font-bold text-slate-800 mt-1">{{ sitemap_analysis.total|default:"0" }}</div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                <div class="text-sm font-medium text-slate-500">Working URLs</div>
+                <div class="text-2xl font-bold text-green-600 mt-1">{{ sitemap_analysis.working|default:"0" }}</div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                <div class="text-sm font-medium text-slate-500">Broken URLs</div>
+                <div class="text-2xl font-bold text-red-600 mt-1">{{ sitemap_analysis.broken|default:"0" }}</div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                <div class="text-sm font-medium text-slate-500">Server Errors</div>
+                <div class="text-2xl font-bold text-orange-600 mt-1">{{ sitemap_analysis.errors|default:"0" }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}

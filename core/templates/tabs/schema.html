@@ -1,0 +1,129 @@
+<!-- Schema Analysis Tab -->
+<div class="space-y-6">
+    <!-- Status Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Total Schemas -->
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">Total Schemas</h3>
+                <i class="fas fa-code text-yellow-300 text-xl"></i>
+            </div>
+            <div class="mt-4">
+                <div class="text-4xl font-bold">{{ schema_analysis.total_schemas }}</div>
+                <div class="text-purple-100 mt-1">Found on Page</div>
+            </div>
+        </div>
+
+        <!-- JSON-LD Schemas -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">JSON-LD</h3>
+                <i class="fas fa-brackets-curly text-yellow-300 text-xl"></i>
+            </div>
+            <div class="mt-4">
+                <div class="text-4xl font-bold">{{ schema_analysis.jsonld_count }}</div>
+                <div class="text-blue-100 mt-1">Schemas Found</div>
+            </div>
+        </div>
+
+        <!-- Microdata Schemas -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between text-slate-800">
+                <h3 class="text-lg font-semibold">Microdata/RDFa</h3>
+                <i class="fas fa-code text-green-500"></i>
+            </div>
+            <div class="mt-4">
+                <div class="text-4xl font-bold text-slate-800">{{ schema_analysis.microdata_count }}</div>
+                <div class="text-slate-500 mt-1">Schemas Found</div>
+            </div>
+        </div>
+
+        <!-- Schema Errors -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between text-slate-800">
+                <h3 class="text-lg font-semibold">Schema Errors</h3>
+                <i class="fas fa-exclamation-triangle text-red-500"></i>
+            </div>
+            <div class="mt-4">
+                <div class="text-4xl font-bold text-slate-800">{{ schema_analysis.errors|length }}</div>
+                <div class="text-slate-500 mt-1">Issues Found</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSON-LD Schema Details -->
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-code text-blue-500 mr-2"></i>
+                JSON-LD Schemas
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4">
+                {% for schema in schema_analysis.jsonld_details %}
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-lg font-semibold text-slate-800">{{ schema.Type }}</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            JSON-LD
+                        </span>
+                    </div>
+                    <pre class="bg-slate-800 rounded-lg p-4 text-sm text-white overflow-x-auto">
+                        <code>{{ schema.Details|pprint }}</code>
+                    </pre>
+                </div>
+                {% empty %}
+                <div class="text-center text-slate-500 py-4">No JSON-LD schemas found</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Microdata Schema Details -->
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-code text-green-500 mr-2"></i>
+                Microdata/RDFa Schemas
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4">
+                {% for schema in schema_analysis.microdata_details %}
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                    <pre class="bg-slate-800 rounded-lg p-4 text-sm text-white overflow-x-auto">
+                        <code>{{ schema }}</code>
+                    </pre>
+                </div>
+                {% empty %}
+                <div class="text-center text-slate-500 py-4">No Microdata/RDFa schemas found</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Schema Errors -->
+    {% if schema_analysis.errors %}
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                Schema Validation Errors
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4">
+                {% for error in schema_analysis.errors %}
+                <div class="bg-red-50 rounded-xl p-4 border border-red-200">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-exclamation-circle text-red-500"></i>
+                        <span class="text-sm font-medium text-red-800">{{ error }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>

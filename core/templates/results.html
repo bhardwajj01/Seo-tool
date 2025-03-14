@@ -1,0 +1,437 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Performance Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter var', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <!-- Font -->
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Meta tags -->
+    <meta name="description" content="Enterprise Performance Analytics Dashboard">
+    <meta name="theme-color" content="#22c55e">
+    <meta property="og:title" content="Performance Analytics">
+    <meta property="og:description" content="Enterprise Performance Analytics Dashboard">
+    <meta property="og:type" content="website">
+</head>
+
+<body class="min-h-screen bg-slate-100 flex flex-col">
+
+    
+    <!-- Header -->
+    <header
+        class="bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-md px-8 py-6 border-b border-emerald-500 fixed w-full z-10 h-[88px]">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-chart-network text-amber-400 mr-3"></i>
+                    SEO ANALYSIS TOOL
+                </h2>
+                <p class="text-sm text-gray-200 mt-1 flex items-center">
+                    <i class="fas fa-link text-gray-300 mr-2"></i>
+                    Analyzing: {{ url }}
+                </p>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <!-- AI Analysis Button -->
+                <button onclick="showTab('ai')"
+                    class="bg-purple-500 text-white px-4 py-2.5 rounded-lg hover:bg-purple-600 transition-all flex items-center shadow-sm hover:shadow-md">
+                    <i class="fas fa-brain mr-2"></i>
+                    AI Analysis
+                </button>               
+                <!-- Export PDF Button -->
+                <button
+                    class="bg-blue-500 text-white px-4 py-2.5 rounded-lg hover:bg-blue-600 transition-all flex items-center shadow-sm hover:shadow-md">
+                    <i class="fas fa-file-pdf mr-2"></i>
+                    Export PDF
+                </button>
+                <!-- Refresh Button -->
+                <button onclick="refreshPage()"
+                    class="bg-emerald-500 p-2.5 rounded-lg hover:bg-emerald-400 transition-colors group">
+                    <i class="fas fa-redo text-white group-hover:text-gray-100 transition-colors"></i>
+                </button> 
+            </div>
+        </div>
+    </header>
+
+    <!-- Main container -->
+    <div class="flex pt-[88px]">
+        <!-- Sidebar -->
+        <div class="w-80 bg-slate-800 shadow-xl fixed top-[88px] h-[calc(100vh-88px)] flex flex-col">
+            <div class="px-6 py-8 border-b border-slate-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-line text-white"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-white">Performance Analytics</h1>
+                </div>
+            </div>
+
+            <nav class="p-4 flex-grow overflow-y-auto">
+                <ul class="space-y-2" id="sidebar-menu">
+                    <li>
+                        <button onclick="showTab('performance')"
+                            class="w-full flex items-center p-4 text-white rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-tachometer-alt w-6"></i>
+                            <span class="ml-3">Performance Metrics</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('indexing')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-spider w-6"></i>
+                            <span class="ml-3">Indexing and Crawlability</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('structure')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-sitemap w-6"></i>
+                            <span class="ml-3">Meta Data & Structure</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('traffic')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-chart-line w-6"></i>
+                            <span class="ml-3">Traffic Profile</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('keywords')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-key w-6"></i>
+                            <span class="ml-3">Keyword Analysis</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('backlink')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-link w-6"></i>
+                            <span class="ml-3">Backlink Analysis</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('social')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-hashtag w-6"></i>
+                            <span class="ml-3">Social Media Profile</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('google_local')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-map-marker-alt w-6"></i>
+                            <span class="ml-3">Google Local Search</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('schema')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-code-branch w-6"></i>
+                            <span class="ml-3">Schema</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('security')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-shield-alt w-6"></i>
+                            <span class="ml-3">Security & SSL Data</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('domain')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-globe w-6"></i>
+                            <span class="ml-3">Domain Data</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showTab('account')"
+                            class="w-full flex items-center p-4 text-slate-300 rounded-lg transition-colors duration-200 hover:bg-green-600 group">
+                            <i class="fas fa-user w-6"></i>
+                            <span class="ml-3">Account Data</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+
+        <div class="p-4">
+            <img src="{% static 'image.png' %}" alt="Floating Image" class="w-full rounded-lg shadow-md">
+        </div>
+
+
+        <!-- Main Content -->
+        <div class="flex-1 ml-80 h-[calc(100vh-88px)] overflow-hidden">
+            <main class="p-8 h-full overflow-y-auto">
+                <div id="tab-content" class="max-w-7xl mx-auto">
+                    <!-- Performance Metrics Tab -->
+                    <div id="performance-content" class="tab-content space-y-6">
+                        {% include 'tabs/performance_metrics.html' %}
+                    </div>
+
+                    <!-- Resource Analysis Tab -->
+                    <div id="security-content" class="tab-content hidden">
+                        {% include 'tabs/resource_analysis.html' %}
+                    </div>
+
+                    <!-- Technical Details Tab -->
+                    <div id="indexing-content" class="tab-content hidden">
+                        {% include 'tabs/indexing.html' %}
+                    </div>
+
+                    <!-- Global Insights Tab -->
+                    <div id="structure-content" class="tab-content hidden">
+                        {% include 'tabs/global_insights.html' %}
+                    </div>
+
+                    <!-- Schema Insights Tab -->
+                    <div id="Schema-content" class="tab-content hidden">
+                        {% include 'tabs/schema.html' %}
+                    </div>
+
+                    <!-- Backlink Profile Insights Tab -->
+                    <div id="Backlink-content" class="tab-content hidden">
+                        {% include 'tabs/backlink.html' %}
+                    </div>
+
+                    <!-- Backlink Profile Insights Tab -->
+                    <div id="traffic-content" class="tab-content hidden">
+                        {% include 'tabs/traffic.html' %}
+                    </div>
+
+
+                    <!-- AI Insights Tab -->
+                    <div id="ai-content" class="tab-content hidden">
+                        {% include 'tabs/ai.html' %}
+                    </div>
+
+                    <!-- account Tab -->
+                    <div id="ai-content" class="tab-content hidden">
+                        {% include 'tabs/account.html' %}
+                    </div>
+
+                    <!-- Domain data Tab -->
+                    <!-- <div id="domain_data-content" class="tab-content hidden">
+                        {% include 'tabs/domain_data.html' %}
+                    </div> -->
+
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <style>
+        html {
+            font-size: 80%;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Fade animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    </style>
+
+    <script>
+
+        function refreshPage() {
+            window.location.href = "{% url 'home' %}"; 
+        }
+
+        // Initialize tooltips and other UI elements
+        const initializeUI = () => {
+            // Add tooltip listeners
+            document.querySelectorAll('[data-tooltip]').forEach(element => {
+                element.addEventListener('mouseenter', showTooltip);
+                element.addEventListener('mouseleave', hideTooltip);
+            });
+            // Initialize animation for metric cards
+            document.querySelectorAll('.metric-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.classList.add('transform', 'scale-105', 'transition-transform');
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.classList.remove('transform', 'scale-105');
+                });
+            });
+        };
+
+        // Tab switching functionality
+        function showTab(tabId) {
+            // Hide all tab contents with fade effect
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('fade-in');
+            });
+
+            // Show selected tab content with fade effect
+            const selectedContent = document.getElementById(`${tabId}-content`);
+            if (selectedContent) {
+                selectedContent.classList.remove('hidden');
+                setTimeout(() => {
+                    selectedContent.classList.add('fade-in');
+                }, 50);
+            }
+
+            // Update active state of sidebar buttons
+            document.querySelectorAll('#sidebar-menu button').forEach(btn => {
+                btn.classList.remove('bg-green-600', 'text-white');
+                btn.classList.add('text-slate-300');
+            });
+
+            const activeButton = document.querySelector(`button[onclick="showTab('${tabId}')"]`);
+            if (activeButton) {
+                activeButton.classList.add('bg-green-600', 'text-white');
+                activeButton.classList.remove('text-slate-300');
+            }
+
+            // Update URL hash for direct linking
+            window.history.pushState({}, '', `#${tabId}`);
+        }
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', () => {
+            const hash = window.location.hash.replace('#', '') || 'performance';
+            showTab(hash);
+        });
+
+        // Format numbers with units
+        function formatMetric(value, unit) {
+            return `${parseFloat(value).toFixed(2)} ${unit}`;
+        }
+
+        // Initialize the dashboard
+       // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial tab based on URL hash or default to performance
+            const initialTab = window.location.hash.replace('#', '') || 'performance';
+            showTab(initialTab);
+
+            // Initialize UI elements
+            initializeUI();
+
+            // Add smooth scroll behavior
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Format all metric values
+            document.querySelectorAll('[data-metric]').forEach(element => {
+                const value = element.textContent;
+                const unit = element.getAttribute('data-unit');
+                if (value && unit) {
+                    element.textContent = formatMetric(value, unit);
+                }
+            });
+
+            // Export functionality - Add this inside your existing DOMContentLoaded listener
+            const analyzedUrl = '{{ url }}';
+
+            // CSV Export button
+            const csvButton = document.querySelector('button.bg-amber-500');
+            if (csvButton) {
+                csvButton.addEventListener('click', () => {
+                    window.location.href = `{% url 'analyzer:export_csv' %}?url=${encodeURIComponent(analyzedUrl)}`;
+                });
+            }
+
+            // PDF Export button
+            const pdfButton = document.querySelector('button.bg-blue-500');
+            if (pdfButton) {
+                pdfButton.addEventListener('click', () => {
+                    window.location.href = `{% url 'analyzer:export_pdf' %}?url=${encodeURIComponent(analyzedUrl)}`;
+                });
+            }
+        }); 
+    </script>
+</body>
+
+</html>
+

@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen flex flex-col">
+    <!-- White Header Section -->
+    <div class="bg-white py-8">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                    ALL-in-One SEO Analysis Tool
+                </h1>
+                <p class="text-lg text-gray-600">
+                    Get comprehensive insights about any website's performance, SEO, and security
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content with Background Video -->
+    <div class="flex-grow relative">
+        <div class="absolute inset-0 overflow-hidden">
+            <video class="w-full h-full object-cover opacity-50" autoplay loop muted playsinline>
+                <source src="{% static 'videos/background.mp4' %}" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- Content Layer -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 h-full flex items-center justify-center">
+            <div class="bg-white bg-opacity-90 rounded-2xl shadow-lg p-8 w-full max-w-6xl mt-64">
+                <form method="POST" action="{% url 'analyzer:analyze' %}" id="analyzeForm">
+                    {% csrf_token %}
+                    <div class="relative flex items-center space-x-6">
+                        <input type="text" name="url" id="websiteUrl" required
+                            class="flex-grow px-8 py-5 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
+                            placeholder="Enter website URL (e.g., https://example.com)">
+                        <button type="submit" id="analyzeBtn"
+                            class="flex-shrink-0 inline-flex items-center px-8 py-5 text-lg font-medium text-white bg-green-600 rounded-xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
+                            <span>Analyze Website</span>
+                            <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- WooRank-Style Progress Bar -->
+                <div id="progressContainer" class="mt-4 hidden">
+                    <div class="relative pt-1">
+                        <div class="overflow-hidden h-4 text-xs flex rounded bg-gray-300">
+                            <div id="progressBar"
+                                class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
+                                style="width: 0%; transition: width 0.5s ease-in-out;"></div>
+                        </div>
+                    </div>
+                    <p id="progressText" class="text-gray-600 text-sm mt-2 text-center">Initializing...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <!-- White Footer Section - Reduced padding and optimized layout -->
+    <div class="bg-white py-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <!-- Features row - Using grid instead of flex -->
+            <div class="grid grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">Performance Analysis</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Detailed insights about loading speed, core web vitals, and overall
+                        performance metrics.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">SEO Analysis</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Comprehensive SEO audit including meta tags, headings, and content
+                        analysis.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">Security Check</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">SSL certificate validation, security headers, and vulnerability
+                        scanning.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">Technical SEO</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Schema markup validation, sitemap analysis, and robots.txt
+                        verification.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Progress Bar -->
+    <script>
+        document.getElementById('analyzeForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission
+    
+            const urlInput = document.getElementById('websiteUrl');
+            let url = urlInput.value.trim();
+    
+            // Auto-add https:// if missing
+            if (!url.match(/^https?:\/\//)) {
+                url = 'https://' + url;
+            }
+            urlInput.value = url;
+    
+            const button = document.getElementById('analyzeBtn');
+            button.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Analyzing...
+            `;
+            button.disabled = true;
+    
+            // Show progress bar
+            document.getElementById('progressContainer').classList.remove('hidden');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+    
+            let progress = 0;
+            let interval = setInterval(() => {
+                if (progress < 90) {
+                    progress += Math.floor(Math.random() * 5) + 3; // Increase gradually
+                } else {
+                    clearInterval(interval); // Stop at 90-95% and wait for response
+                }
+                if (progress > 95) progress = 95; // Prevent exceeding 95%
+    
+                progressBar.style.width = progress + "%";
+                progressText.innerText = `Analyzing... ${progress}%`;
+            }, 500);
+    
+            // Fetch request to backend
+            fetch("{% url 'analyzer:analyze' %}", {
+                method: "POST",
+                body: new FormData(e.target)
+            }).then(response => {
+                if (response.ok) {
+                    // **Once response is ready, go to 100% and load page**
+                    progressBar.style.width = "100%";
+                    progressText.innerText = "Finalizing analysis...";
+                    setTimeout(() => e.target.submit(), 500);
+                }
+            });
+        });
+    </script>
+    
+
+    <style>
+        body {
+            transform: scale(0.8);
+            transform-origin: top left;
+            width: 125%;
+        }
+    </style>
+
+</body>
+
+</html>

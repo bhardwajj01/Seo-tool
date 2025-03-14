@@ -1,0 +1,221 @@
+{% load static %}
+<!-- Status Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <!-- SSL Status -->
+    <div
+        class="bg-gradient-to-br {% if ssl_info.is_valid %}from-blue-500 to-blue-600{% else %}from-red-500 to-red-600{% endif %} rounded-xl shadow-lg p-6 text-white"
+        title="Indicates whether your SSL certificate is valid or expired.">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">SSL Status</h3>
+            <i class="fas fa-shield-alt text-yellow-300 text-xl"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold">
+                {{ ssl_info.status }}
+            </div>
+            <div class="text-blue-100 mt-1">Certificate Status</div>
+        </div>
+    </div>
+
+    <!-- Malware Status -->
+    <div
+        class="bg-gradient-to-br {% if malware_info.is_safe %}from-green-500 to-green-600{% else %}from-red-500 to-red-600{% endif %} rounded-xl shadow-lg p-6 text-white"
+        title="Indicates if the website is safe or at risk due to malware.">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Security Status</h3>
+            <i
+                class="fas {% if malware_info.is_safe %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %} text-yellow-300 text-xl"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold">
+                {% if malware_info.is_safe %}Safe{% else %}At Risk{% endif %}
+            </div>
+            <div class="text-green-100 mt-1">Scan Complete</div>
+        </div>
+    </div>
+
+    <!-- Days Until Expiration -->
+    <div class="bg-white rounded-xl shadow-lg p-6"
+        title="Shows the number of days left until the SSL certificate expires.">
+        <div class="flex items-center justify-between text-slate-800">
+            <h3 class="text-lg font-semibold">Certificate Expiration</h3>
+            <i class="fas fa-calendar-alt text-blue-500"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold text-slate-800">
+                {{ ssl_info.days_left }}
+                <span class="text-base font-normal text-slate-500"> days</span>
+            </div>
+            <div class="text-slate-500 mt-1">Until Expiration</div>
+        </div>
+    </div>
+
+    <!-- Indexing Status -->
+    <div class="bg-white rounded-xl shadow-lg p-6"
+        title="Displays whether the website is indexed or blocked by search engines.">
+        <div class="flex items-center justify-between text-slate-800">
+            <h3 class="text-lg font-semibold">Indexing Status</h3>
+            <i class="fas fa-robot text-blue-500"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold text-slate-800">
+                {% if not indexing_info.noindex_meta %}Indexed{% else %}No-Index{% endif %}
+            </div>
+            <div class="text-slate-500 mt-1">
+                {% if indexing_info.robots_txt_status %}robots.txt Present{% else %}No robots.txt{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Information -->
+<div class="grid grid-cols-1 gap-6 mb-6">
+    <!-- SSL Certificate Details -->
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-certificate text-blue-500 mr-2"></i>
+                SSL Certificate Details
+            </h3>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Issuer Information -->
+            <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                <h4 class="text-lg font-semibold text-slate-800 mb-4">Issuer Information</h4>
+                <div class="space-y-4">
+                    {% for key, value in ssl_info.issuer.items %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-600">{{ key }}</span>
+                        <span class="text-sm text-slate-800">{{ value }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-600">Expiration Date</span>
+                        <span class="text-sm text-slate-800">{{ ssl_info.expiration_date|date:"F j, Y" }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-600">Days Remaining</span>
+                        <span class="text-sm text-slate-800">{{ ssl_info.days_left }} days</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Information -->
+            <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                <h4 class="text-lg font-semibold text-slate-800 mb-4">Certificate Subject</h4>
+                <div class="space-y-4">
+                    {% for key, value in ssl_info.subject.items %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-600">{{ key }}</span>
+                        <span class="text-sm text-slate-800">{{ value }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-600">Version</span>
+                        <span class="text-sm text-slate-800">{{ ssl_info.version }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-slate-600">Serial Number</span>
+                        <span class="text-sm text-slate-800">{{ ssl_info.serialNumber }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Status Details -->
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800">
+                <i class="fas fa-shield-virus text-blue-500 mr-2"></i>
+                Security Status Details
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-2">
+                        <span class="text-sm font-medium text-slate-600">Malware Status</span>
+                        {% if malware_info.status == "safe" %}
+                        <span class="px-4 py-1.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200
+                                     shadow-[0_0_10px_rgba(34,197,94,0.3)] animate-pulse-slow flex items-center gap-2">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            No Threats Detected
+                        </span>
+                        {% else %}
+                        <span class="px-4 py-1.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200
+                                     shadow-[0_0_10px_rgba(239,68,68,0.3)] flex items-center gap-2">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Potential Risk Detected
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if malware_info.threat_details %}
+                    <div class="mt-4 p-4 bg-red-50 rounded-lg">
+                        <h5 class="text-sm font-medium text-red-800 mb-3">Detected Threats:</h5>
+                        {% for threat in malware_info.threat_details %}
+                        <div class="mb-3 pl-4 border-l-2 border-red-300">
+                            <div class="text-sm text-red-700">
+                                <strong>Type:</strong> {{ threat.type }}
+                            </div>
+                            <div class="text-sm text-red-600">
+                                <strong>Platform:</strong> {{ threat.platform }}
+                            </div>
+                            <div class="text-sm text-red-600">
+                                <strong>URL:</strong> {{ threat.threat_entry }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Robots.txt Content -->
+    {% if indexing_info.robots_txt_content %}
+    <section class="bg-white rounded-xl shadow-lg">
+        <div class="p-6 border-b border-slate-100">
+            <button onclick="toggleRobotsContent()" class="w-full flex items-center justify-between focus:outline-none">
+                <div class="flex items-center">
+                    <i class="fas fa-file-alt text-blue-500 mr-2"></i>
+                    <h3 class="text-xl font-bold text-slate-800">Robots.txt Content</h3>
+                </div>
+                <div class="flex items-center text-slate-500 hover:text-blue-500">
+                    <span class="text-sm mr-2" id="robotsContentText">View Content</span>
+                    <i class="fas fa-chevron-down transition-transform duration-300" id="robotsContentArrow"></i>
+                </div>
+            </button>
+        </div>
+        <div class="overflow-hidden transition-all duration-300 h-0" id="robotsContent">
+            <div class="p-6">
+                <pre
+                    class="bg-slate-50 rounded-xl p-6 border border-slate-200 text-sm text-slate-800 overflow-x-auto whitespace-pre-wrap">{{ indexing_info.robots_txt_content }}</pre>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<script>
+    function toggleRobotsContent() {
+        const content = document.getElementById('robotsContent');
+        const arrow = document.getElementById('robotsContentArrow');
+        const text = document.getElementById('robotsContentText');
+
+        if (content.style.height === 'auto') {
+            content.style.height = '0';
+            arrow.style.transform = 'rotate(0deg)';
+            text.textContent = 'View Content';
+        } else {
+            content.style.height = 'auto';
+            arrow.style.transform = 'rotate(180deg)';
+            text.textContent = 'Hide Content';
+        }
+    }
+</script>

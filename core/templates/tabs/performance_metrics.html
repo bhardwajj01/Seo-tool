@@ -1,0 +1,224 @@
+<!-- Core Performance Summary -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    {% for country, data in adjusted_scores.items %}
+    {% if country == "USA" %}
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Website Performance Score</h3>
+            <i class="fas fa-star text-yellow-300 text-xl"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold">{{ data.Score|floatformat:2 }}</div>
+            <div class="text-green-100 mt-1">Overall Score</div>
+        </div>
+    </div>
+
+    <!-- Grade Card -->
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Website Performance Grade</h3>
+            <i class="fas fa-award text-yellow-300 text-xl"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold">{{ data.Grade }}</div>
+            <div class="text-purple-100 mt-1">Grade Level</div>
+        </div>
+    </div>
+
+    <!-- SEO Performance Score -->
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">SEO Performance Score</h3>
+            <i class="fas fa-chart-line text-yellow-300 text-xl"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold">{{ data.SEO_Score|floatformat:2 }}</div>
+            <div class="text-blue-100 mt-1">SEO Score</div>
+        </div>
+    </div>
+
+    <!-- SEO Grade -->
+    <div class="bg-gradient-to-br from-red-400 to-red-500 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">SEO Grade</h3>
+            <i class="fas fa-medal text-yellow-300 text-xl"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold">{{ data.SEO_Grade }}</div>
+            <div class="text-red-100 mt-1">SEO Grade Level</div>
+        </div>
+    </div>
+
+    
+    {% endif %}
+    {% endfor %}
+
+    {% for key, value in pagespeed_metrics.items %}
+    {% if key == "TTI (Time to Interactive)" %}
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between text-slate-800">
+            <h3 class="text-lg font-semibold">Time to Interactive</h3>
+            <i class="fas fa-clock text-green-500"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold text-slate-800">{{ value|floatformat:2 }}<span
+                    class="text-base font-normal text-slate-500"> ms</span></div>
+            <div class="text-slate-500 mt-1">Response Time</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if key == "SI (Speed Index)" %}
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between text-slate-800">
+            <h3 class="text-lg font-semibold">Speed Index</h3>
+            <i class="fas fa-gauge-high text-green-500"></i>
+        </div>
+        <div class="mt-4">
+            <div class="text-4xl font-bold text-slate-800">{{ value|floatformat:2 }}<span
+                    class="text-base font-normal text-slate-500"> sec</span></div>
+            <div class="text-slate-500 mt-1">Loading Speed</div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<!-- Core Metrics -->
+<section class="bg-white rounded-xl shadow-lg">
+    <div class="p-6 border-b border-slate-100">
+        <h3 class="text-xl font-bold text-slate-800">
+            <i class="fas fa-bolt text-green-500 mr-2"></i>
+            Core Web Vitals
+        </h3>
+    </div>
+    <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for key, value in core_metrics.items %}
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-sm font-medium text-slate-500">{{ key }}</span>
+                <span class="px-3 py-1 rounded-full text-xs font-medium 
+                    {% if value < 1000 %}bg-green-100 text-green-800
+                    {% elif value < 2500 %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-red-100 text-red-800{% endif %}">
+                    {% if "Time" in key or "Paint" in key %}
+                    {{ value|floatformat:2 }} ms
+                    {% else %}
+                    {{ value|floatformat:2 }}
+                    {% endif %}
+                </span>
+            </div>
+            <div class="mt-2">
+                <div class="w-full bg-slate-200 rounded-full h-2">
+                    <div class="h-2 rounded-full 
+                        {% if value < 1000 %}bg-green-500
+                        {% elif value < 2500 %}bg-yellow-500
+                        {% else %}bg-red-500{% endif %}" style="width: {% widthratio value max_value 100 %}%">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Regional Performance -->
+<section class="bg-white rounded-xl shadow-lg">
+    <div class="p-6 border-b border-slate-100">
+        <h3 class="text-xl font-bold text-slate-800">
+            <i class="fas fa-globe text-green-500 mr-2"></i>
+            Regional Performance
+        </h3>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for country, data in adjusted_scores.items %}
+            <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <span class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                        <img src="https://flagcdn.com/24x18/{% if country == 'USA' %}us{% elif country == 'Turkey' %}tr{% elif country == 'Canada' %}ca{% elif country == 'Brazil' %}br{% elif country == 'France' %}fr{% elif country == 'Japan' %}jp{% endif %}.png"
+                            alt="{{ country }} flag" class="h-6">
+                        {{ country }}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium 
+                        {% if data.Score >= 90 %}bg-green-100 text-green-800
+                        {% elif data.Score >= 70 %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ data.Score|floatformat:2 }}
+                    </span>
+                </div>
+                <div class="mt-4">
+                    <div class="text-sm font-medium text-slate-500">Performance Grade</div>
+                    <div class="text-2xl font-bold text-slate-800 mt-1">{{ data.Grade }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Technical Details -->
+<section class="bg-white rounded-xl shadow-lg">
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Timing Metrics -->
+            <div
+                class="group bg-gradient-to-br from-slate-50 to-white rounded-xl p-6 border border-slate-200 hover:border-green-200 transition-all duration-300">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-clock text-green-500"></i>
+                        <h4 class="text-lg font-semibold text-slate-800">Timing Metrics</h4>
+                    </div>
+                    <span
+                        class="px-4 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 group-hover:bg-green-50 group-hover:text-green-700 transition-colors duration-300">
+                        Performance
+                    </span>
+                </div>
+                <div class="space-y-4">
+                    {% for name, value in timing_metrics.items %}
+                    <div
+                        class="flex justify-between items-center p-2 hover:bg-slate-50 rounded-lg transition-colors duration-200">
+                        <span class="text-sm font-medium text-slate-600 flex items-center gap-2">
+                            <i
+                                class="fas fa-chart-line text-green-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
+                            {{ name }}
+                        </span>
+                        <span class="text-sm font-bold text-slate-800 bg-white px-3 py-1 rounded-md shadow-sm">
+                            {{ value|floatformat:2 }} s
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <!-- PageSpeed Metrics -->
+            <div
+                class="group bg-gradient-to-br from-slate-50 to-white rounded-xl p-6 border border-slate-200 hover:border-blue-200 transition-all duration-300">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-gauge-high text-blue-500"></i>
+                        <h4 class="text-lg font-semibold text-slate-800">PageSpeed Metrics</h4>
+                    </div>
+                    <span
+                        class="px-4 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 group-hover:bg-blue-50 group-hover:text-blue-700 transition-colors duration-300">
+                        Performance
+                    </span>
+                </div>
+                <div class="space-y-4">
+                    {% for name, value in pagespeed_metrics.items %}
+                    <div
+                        class="flex justify-between items-center p-2 hover:bg-slate-50 rounded-lg transition-colors duration-200">
+                        <span class="text-sm font-medium text-slate-600 flex items-center gap-2">
+                            <i
+                                class="fas fa-bolt text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
+                            {{ name }}
+                        </span>
+                        <span class="text-sm font-bold text-slate-800 bg-white px-3 py-1 rounded-md shadow-sm">
+                            {{ value|floatformat:2 }} ms
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
