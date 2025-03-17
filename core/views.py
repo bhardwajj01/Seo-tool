@@ -6,7 +6,6 @@ from .services.ssl import analyze_ssl_security
 from .services.indexing_and_crawlability import indexing_and_crawlability
 from .services.schema import check_schema
 from .services.audit import site_audit
-from.services.domain_and_whois_data import fetch_domain_info
 from openai import OpenAI
 
 import asyncio
@@ -14,28 +13,8 @@ import json
 from collections import OrderedDict
 
 
-# def home(request):
-#     if request.GET.get('refresh') == 'true':
-#         # Clear session data
-#         request.session.flush()
-
-#         # Clear Django cache
-#         cache.clear()
-
-#         print("Cache and session data cleared. Performing a fresh scan.")
-
-#     return render(request, "index.html")
-
 def home(request):
-    # Always clear session and cache when the page loads
-    request.session.flush()
-    cache.clear()
-
-    print("Cache and session data cleared. Performing a fresh scan.")
-
     return render(request, "index.html")
-
-
 import json
 from openai import OpenAI
 
@@ -125,210 +104,68 @@ def get_ai_analysis(analysis_data):
 def analyze(request):
     if request.method == "POST":
         url = request.POST.get("url")
-        
-        # Try to get cached results
-        cache_key = f'website_analysis_{url}'
-        cached_result = cache.get(cache_key)
-        
-        if cached_result:
-            return render(request, "results.html", cached_result)
-        
-        # If no cache, perform analysis
+        # Store URL in session for refresh handling
+        request.session['analysis_url'] = url
+        return perform_analysis(request, url)
+    else:
+        # Handle browser refresh - get URL from session
+        url = request.session.get('analysis_url')
+        if url:
+            return perform_analysis(request, url)
+        return render(request, "index.html")
+
+def perform_analysis(request, url):
+    """Helper function to perform the actual analysis"""
+    # Clear existing cache to force fresh analysis
+    cache_key = f'website_analysis_{url}'
+    cache.delete(cache_key)
+    
+    try:
+        # Run all analyses concurrently
         async def run_analysis():
-            # Run all analyses concurrently
             performance_task = analyze_website_performance(url)
             ssl_task = analyze_ssl_security(url)
             indexing_task = indexing_and_crawlability(url)
             audit_task = site_audit(url) 
             schema_task = check_schema(url)
-            # domain_info_task= fetch_domain_info(url) 
-            # Add traffic metrics task here - but it's synchronous so we need to run it in a separate thread
             traffic_task = asyncio.to_thread(get_semrush_traffic_metrics, url)
-            # domain_info_task
-            results = await asyncio.gather(performance_task, ssl_task, indexing_task, audit_task, schema_task, traffic_task)
+            
+            results = await asyncio.gather(
+                performance_task, ssl_task, indexing_task, 
+                audit_task, schema_task, traffic_task
+            )
+            
             return results
-
-    #  domain_info_result
-        # Run all analyses
-        performance_result, security_result, indexing_result, audit_result, schema_result, traffic_result = asyncio.run(run_analysis())
         
-        # Get the metrics from the performance result
-        metrics = performance_result["Performance Metrics"]
+        # Execute analysis
+        results = asyncio.run(run_analysis())
         
-        # Organize metrics into categories
-        categorized_metrics = {
-            'core_metrics': {},
-            'pagespeed_metrics': {},
-            'timing_metrics': {},
-        }
-        
-        # Core metrics list
-        core_metrics_list = [
-            'TTFB', 'Redirect Time', 'Connect Time', 'Backend Time',
-            'First Contentful Paint', 'Largest Contentful Paint',
-            'Cumulative Layout Shift', 'Onload Time', 'Fully Loaded Time'
-        ]
-        
-        # PageSpeed metrics list
-        pagespeed_metrics_list = [
-            'TBT (Total Blocking Time)',
-            'TTI (Time to Interactive)',
-            'SI (Speed Index)'
-        ]
-
-        # Get navigation start time for relative calculations
-        navigation_start = metrics.get('Navigation Start Time', 0)
-        
-        # Categorize and process each metric
-        for key, value in metrics.items():
-            if key in core_metrics_list:
-                categorized_metrics['core_metrics'][key] = value
-            elif key in pagespeed_metrics_list:
-                categorized_metrics['pagespeed_metrics'][key] = value
-            elif 'Time' in key and key not in core_metrics_list:
-                if isinstance(value, (int, float)):
-                    relative_time = value - navigation_start
-                    categorized_metrics['timing_metrics'][key] = round(relative_time / 1000, 3)
-                else:
-                    categorized_metrics['timing_metrics'][key] = value
-
-        # Sort timing metrics by sequence
-        timing_sequence = [
-            'Navigation Start Time',
-            'Request Start Time',
-            'Response Start Time',
-            'Response End Time',
-            'DOM Loading Time',
-            'DOM Interactive Time',
-            'DOM Complete Time',
-            'Load Event End Time'
-        ]
-        
-        # Create ordered timing metrics
-        timing_metrics_ordered = OrderedDict()
-        for metric in timing_sequence:
-            if metric in categorized_metrics['timing_metrics']:
-                timing_metrics_ordered[metric] = categorized_metrics['timing_metrics'][metric]
-        
-        for key, value in categorized_metrics['timing_metrics'].items():
-            if key not in timing_metrics_ordered:
-                timing_metrics_ordered[key] = value
-
-        # Format raw data as JSON strings
-        raw_data = {
-            'paint_events_data': json.dumps(metrics.get('Paint Events Data', {}), indent=2),
-            'web_vitals_data': json.dumps(metrics.get('Web Vitals Data', {}), indent=2),
-            'complete_timing_data': json.dumps(metrics.get('Complete Timing Data', {}), indent=2)
-        }
-
-        # Get security threat details
-        malware_info = security_result.get("malware_info", {})
-        threat_details = []
-        if malware_info.get("status") == "malicious":
-            for match in malware_info.get("details", []):
-                threat_details.append({
-                    "type": match.get("threatType", "Unknown Threat"),
-                    "platform": match.get("platformType", "All Platforms"),
-                    "threat_entry": match.get("threat", {}).get("url", "Unknown URL")
-                })
-
-        # Process indexing and crawlability results
-        serp_analysis = indexing_result.get("serp_analysis", {})
-        domain_metrics = indexing_result.get("domain_metrics", {})
-        sitemap_analysis = indexing_result.get("sitemap_analysis", {})
-
-        # Prepare context data with all results
+        # Process results and create context
         context = {
-            # Performance data
-            "core_metrics": OrderedDict(sorted(categorized_metrics['core_metrics'].items())),
-            "pagespeed_metrics": OrderedDict(sorted(categorized_metrics['pagespeed_metrics'].items())),
-            "timing_metrics": timing_metrics_ordered,
-            "raw_data": raw_data,
-            "raw_score": performance_result["Raw Performance Score"],
-            "adjusted_scores": performance_result["Adjusted Scores"],
             "url": url,
-            
-            # SSL and security data
-            "ssl_info": security_result.get("ssl_info", {}),
-            "indexing_info": security_result.get("indexing_info", {}),
-            "ssl_status": security_result.get("status", "error"),
-            
-            # Malware information
-            "malware_info": {
-                "status": malware_info.get("status", "unknown"),
-                "check_time": malware_info.get("check_time"),
-                "threat_details": threat_details,
-                "is_safe": malware_info.get("status") == "safe"
-            },
-            
-            # New indexing and crawlability data
-            "serp_analysis": {
-                "indexed_pages": serp_analysis.get("indexed_pages", []),
-                "rankings": serp_analysis.get("rankings", []),
-                "competitors": serp_analysis.get("competitors", [])
-            },
-            "domain_metrics": domain_metrics,
-            "sitemap_analysis": sitemap_analysis,
-            
-            "audit_results": {
-                "missing_meta": audit_result.get("missing_meta_descriptions", []),
-                "missing_titles": audit_result.get("missing_titles", []),
-                "missing_h1": audit_result.get("missing_h1_tags", []),
-                "missing_h2": audit_result.get("missing_h2_tags", []),
-                "missing_h3": audit_result.get("missing_h3_tags", []),
-                "duplicate_meta": audit_result.get("duplicate_meta_descriptions", {}),
-                "duplicate_titles": audit_result.get("duplicate_titles", {}),
-                "broken_links": audit_result.get("broken_links", []),
-                "keyword_scan": audit_result.get("keyword_scan", {}),
-                "uncompressed_pages": audit_result.get("uncompressed_pages", [])
-            },
-            "schema_analysis": {
-                "status": schema_result.get("Status"),
-                "total_schemas": schema_result.get("Total Schemas Found", 0),
-                "jsonld_count": schema_result.get("JSON-LD Schemas Found", 0),
-                "microdata_count": schema_result.get("Microdata/RDFa Schemas Found", 0),
-                "errors": schema_result.get("Errors", []),
-                "jsonld_details": schema_result.get("JSON-LD Schema Details", []),
-                "microdata_details": schema_result.get("Microdata/RDFa Schema Details", [])
-            },
-            
-            # Add this to the context dictionary
-            "traffic_metrics": {
-                "status": "success" if traffic_result else "error",
-                "data": traffic_result.get("metrics", {}) if traffic_result else {},
-                "domain": url,
-                "timestamp": traffic_result.get("timestamp") if traffic_result else None
-            },
-            # "domain_info": {
-            #     "ip_addresses": domain_info_result.get("ip_addresses", "N/A"),
-            #     "whois_info": {
-            #         "Domain Name": domain_info_result.get("whois_info", {}).get("Domain Name", "N/A"),
-            #         "Registrar": domain_info_result.get("whois_info", {}).get("Registrar", "N/A"),
-            #         "Creation Date": domain_info_result.get("whois_info", {}).get("Creation Date", "N/A"),
-            #         "Expiration Date": domain_info_result.get("whois_info", {}).get("Expiration Date", "N/A"),
-            #         "Status": domain_info_result.get("whois_info", {}).get("Status", "N/A"),
-            #     },
-            #     "dns_records": domain_info_result.get("dns_records", {}),
-            #     "blacklist_status": domain_info_result.get("blacklist_status", "Not Available"),
-            # }
-
-            
+            "performance_metrics": results[0],
+            "ssl_security": results[1],
+            "indexing_data": results[2],
+            "site_audit": results[3],
+            "schema_data": results[4],
+            "traffic_metrics": results[5]
         }
-        # Now run the AI analysis after all other analyses are complete
+        
+        # Add AI analysis
         ai_analysis_result = get_ai_analysis(context)
-        
-        # Add the AI analysis results to the context
         context["ai_analysis"] = ai_analysis_result
-        print("=============================")
-        print("arun codde",context)
         
-        # Cache the results for 1 hour (3600 seconds)
+        # Cache the new results
         cache.set(cache_key, context, 3600)
         
         return render(request, "results.html", context)
-
         
-    return render(request, "index.html")
+    except Exception as e:
+        error_context = {
+            "error": str(e),
+            "url": url
+        }
+        return render(request, "index.html", error_context)
 
 
 # Add these imports to your views.py file
