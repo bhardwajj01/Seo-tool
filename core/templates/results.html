@@ -196,7 +196,7 @@
         
 
         <div class="p-4">
-            <img src="{% static 'image.png' %}" alt="Floating Image" class="w-full rounded-lg shadow-md">
+            <img src="{% static 'images/default-placeholder.png' %}" onerror="this.style.display='none'" alt="Analysis Image">
         </div>
 
 
@@ -317,7 +317,67 @@
     <script>
 
         function refreshPage() {
-            window.location.href = "{% url 'home' %}"; 
+            const analyzedUrl = '{{ url }}';
+            
+            // Show loading state
+            const refreshButton = document.querySelector('button[onclick="refreshPage()"]');
+            const originalContent = refreshButton.innerHTML;
+            refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin text-white"></i>';
+            refreshButton.disabled = true;
+
+            showLoadingOverlay();
+
+            fetch("{% url 'analyzer:analyze' %}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `url=${encodeURIComponent(analyzedUrl)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    throw new Error(data.error);
+                }
+                
+                // Update each tab's content with new data
+                updatePerformanceTab(data.performance_metrics);
+                updateIndexingTab(data.indexing_data);
+                updateTrafficTab(data.traffic_metrics);
+                updateAIAnalysisTab(data.ai_analysis);
+                
+                // Reset button state
+                refreshButton.innerHTML = originalContent;
+                refreshButton.disabled = false;
+                
+                hideLoadingOverlay();
+                showNotification('Analysis updated successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                refreshButton.innerHTML = originalContent;
+                refreshButton.disabled = false;
+                hideLoadingOverlay();
+                showNotification(`Error: ${error.message || 'Failed to refresh analysis'}`, 'error');
+            });
+        }
+
+        // Helper function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
 
         // Initialize tooltips and other UI elements
@@ -429,7 +489,75 @@
                     window.location.href = `{% url 'analyzer:export_pdf' %}?url=${encodeURIComponent(analyzedUrl)}`;
                 });
             }
-        }); 
+        });
+
+        // Helper functions
+        function showLoadingOverlay() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            overlay.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl flex items-center space-x-4">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                    <p class="text-lg">Refreshing analysis...</p>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white z-50 animate-fade-in`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Tab update functions
+        function updatePerformanceTab(data) {
+            // Update performance metrics in the UI
+            const performanceTab = document.getElementById('performance-tab');
+            if (performanceTab) {
+                // Update metrics
+                document.querySelectorAll('[data-metric]').forEach(element => {
+                    const metricName = element.getAttribute('data-metric');
+                    if (data[metricName]) {
+                        element.textContent = formatMetric(data[metricName], element.getAttribute('data-unit'));
+                    }
+                });
+            }
+        }
+
+        function updateIndexingTab(data) {
+            const indexingTab = document.getElementById('indexing-tab');
+            if (indexingTab) {
+                // Update indexing data
+                // Add your indexing tab update logic here
+            }
+        }
+
+        function updateTrafficTab(data) {
+            const trafficTab = document.getElementById('traffic-tab');
+            if (trafficTab) {
+                // Update traffic metrics
+                // Add your traffic tab update logic here
+            }
+        }
+
+        function updateAIAnalysisTab(data) {
+            const aiTab = document.getElementById('ai-tab');
+            if (aiTab) {
+                // Update AI analysis content
+                // Add your AI tab update logic here
+            }
+        }
     </script>
 </body>
 

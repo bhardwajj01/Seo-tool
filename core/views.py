@@ -11,7 +11,8 @@ from openai import OpenAI
 import asyncio
 import json
 from collections import OrderedDict
-
+from django.http import JsonResponse
+from asgiref.sync import async_to_sync
 
 def home(request):
     return render(request, "index.html")
@@ -104,63 +105,95 @@ def get_ai_analysis(analysis_data):
 def analyze(request):
     if request.method == "POST":
         url = request.POST.get("url")
-        # Store URL in session for refresh handling
+        
+        # Clear existing cache
+        cache_key = f'website_analysis_{url}'
+        cache.delete(cache_key)
+        
+        # Store URL in session
         request.session['analysis_url'] = url
+        
+        # Check if it's an AJAX request
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            try:
+                # Properly await the async function
+                results = async_to_sync(perform_analysis_async)(url)
+                
+                # Return JSON response
+                return JsonResponse({
+                    'status': 'success',
+                    'performance_metrics': results['performance_metrics'],
+                    'ssl_security': results['ssl_security'],
+                    'indexing_data': results['indexing_data'],
+                    'site_audit': results['site_audit'],
+                    'schema_data': results['schema_data'],
+                    'traffic_metrics': results['traffic_metrics'],
+                    'ai_analysis': results['ai_analysis']
+                })
+            except Exception as e:
+                print(f"Analysis error: {str(e)}")
+                return JsonResponse({
+                    'status': 'error',
+                    'error': str(e)
+                }, status=500)
+        
+        # For non-AJAX requests, proceed with normal flow
         return perform_analysis(request, url)
     else:
-        # Handle browser refresh - get URL from session
         url = request.session.get('analysis_url')
         if url:
             return perform_analysis(request, url)
         return render(request, "index.html")
 
+async def perform_analysis_async(url):
+    """Async version of perform_analysis that returns results directly"""
+    performance_task = analyze_website_performance(url)
+    ssl_task = analyze_ssl_security(url)
+    indexing_task = indexing_and_crawlability(url)
+    audit_task = site_audit(url) 
+    schema_task = check_schema(url)
+    traffic_task = asyncio.to_thread(get_semrush_traffic_metrics, url)
+    
+    results = await asyncio.gather(
+        performance_task, ssl_task, indexing_task, 
+        audit_task, schema_task, traffic_task
+    )
+    
+    context = {
+        "performance_metrics": results[0],
+        "ssl_security": results[1],
+        "indexing_data": results[2],
+        "site_audit": results[3],
+        "schema_data": results[4],
+        "traffic_metrics": results[5]
+    }
+    
+    # Add AI analysis
+    ai_analysis_result = get_ai_analysis(context)
+    context["ai_analysis"] = ai_analysis_result
+    
+    return context
+
 def perform_analysis(request, url):
     """Helper function to perform the actual analysis"""
-    # Clear existing cache to force fresh analysis
-    cache_key = f'website_analysis_{url}'
-    cache.delete(cache_key)
-    
     try:
-        # Run all analyses concurrently
-        async def run_analysis():
-            performance_task = analyze_website_performance(url)
-            ssl_task = analyze_ssl_security(url)
-            indexing_task = indexing_and_crawlability(url)
-            audit_task = site_audit(url) 
-            schema_task = check_schema(url)
-            traffic_task = asyncio.to_thread(get_semrush_traffic_metrics, url)
-            
-            results = await asyncio.gather(
-                performance_task, ssl_task, indexing_task, 
-                audit_task, schema_task, traffic_task
-            )
-            
-            return results
-        
-        # Execute analysis
-        results = asyncio.run(run_analysis())
+        # Run analysis asynchronously
+        results = async_to_sync(perform_analysis_async)(url)
         
         # Process results and create context
         context = {
             "url": url,
-            "performance_metrics": results[0],
-            "ssl_security": results[1],
-            "indexing_data": results[2],
-            "site_audit": results[3],
-            "schema_data": results[4],
-            "traffic_metrics": results[5]
+            **results
         }
         
-        # Add AI analysis
-        ai_analysis_result = get_ai_analysis(context)
-        context["ai_analysis"] = ai_analysis_result
-        
         # Cache the new results
+        cache_key = f'website_analysis_{url}'
         cache.set(cache_key, context, 3600)
         
         return render(request, "results.html", context)
         
     except Exception as e:
+        print(f"Analysis error: {str(e)}")
         error_context = {
             "error": str(e),
             "url": url

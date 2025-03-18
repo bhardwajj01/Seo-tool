@@ -2,6 +2,7 @@ from playwright.sync_api import sync_playwright
 import json
 import time
 import os
+from pathlib import Path
 
 def get_semrush_traffic_metrics(domain_to_search):
     """
@@ -197,9 +198,17 @@ def get_semrush_traffic_metrics(domain_to_search):
             browser = p.chromium.launch(headless=False)
             context = browser.new_context()
             
-            # Load cookies
-            print(f"Loading cookies from smrush-cookie.txt...")
-            cookies = parse_netscape_cookies(r"X:\Coding Junk\Git Adventure\Website Performance\django\analyzer\core\services\smrush-cookie.txt")
+            # Use relative path for cookies
+            cookie_path = Path(__file__).parent / 'smrush-cookie.txt'
+            if not cookie_path.exists():
+                print(f"Warning: Cookie file not found at {cookie_path}")
+                return {
+                    "status": "error",
+                    "message": "Cookie file not found"
+                }
+                
+            print(f"Loading cookies from {cookie_path}...")
+            cookies = parse_netscape_cookies(str(cookie_path))
             context.add_cookies(cookies)
             
             # Create a new page and navigate to Semrush
